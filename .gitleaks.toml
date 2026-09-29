@@ -1,0 +1,24 @@
+# Regras do gitleaks para este repositório: as padrão (tokens de Telegram, GitHub,
+# AWS, JWT, chaves privadas...) mais as que só a Zênite tem. Roda na CI em todo PR e
+# em todo push na main (.github/workflows/seguranca.yml), só nos commits novos.
+title = "Zênite — segredos que não podem entrar no git"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "zenite-link-secreto-entrega"
+description = "Link secreto de página de entrega de cliente: é a senha da página e mora só no Blob privado (entregas/README.md)"
+regex = '''marca/[a-z0-9]+(?:-[a-z0-9]+)*-[a-f0-9]{12,}'''
+keywords = ["marca/"]
+
+[[rules]]
+id = "zenite-slug-solto"
+description = "Slug de entrega sem o prefixo marca/ (numa nota, script ou log): <cliente>-<24+ hex> gerado por entregas/publicar.mjs --novo-slug"
+regex = '''\b[a-z][a-z0-9]*(?:-[a-z0-9]+)*-[a-f0-9]{24,}\b'''
+
+[[rules]]
+id = "zenite-callmebot-apikey"
+description = "Chave da API do CallMeBot: manda WhatsApp em nome do dono e não tem como revogar"
+regex = '''(?i)apikey["'\s:=]+["']?\d{5,}'''
+keywords = ["apikey"]

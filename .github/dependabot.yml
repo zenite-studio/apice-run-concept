@@ -1,0 +1,34 @@
+# Dependabot: além dos alertas e dos PRs de correção de segurança (ligados nas
+# configurações do repositório), abre 1 PR por mês com as atualizações menores
+# juntas (só minor/patch), para o site não ficar parado em versão velha. Todo PR passa pela CI de
+# segurança e pelo preview da Vercel, e só entra com o OK do Arthur.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      dependencias:
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5
+    # Versão nova só depois de 7 dias publicada: pacote sequestrado costuma ser
+    # descoberto e retirado nesse prazo. Correção de segurança ignora o cooldown.
+    cooldown:
+      default-days: 7
+    # Versão MAIOR (React 19, Vite 8...) não vem sozinha: muda pré-render, hidratação
+    # e build, e se faz num PR planejado e testado. Se uma correção de segurança exigir
+    # versão maior, o alerta do Dependabot e o `npm audit` da CI acusam do mesmo jeito.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
